@@ -1,0 +1,63 @@
+import random
+
+def calculate_conflicts(board):
+    conflicts = 0
+    n = len(board)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if board[i] == board[j] or abs(board[i] - board[j]) == abs(i - j):
+                conflicts += 1
+    return conflicts
+
+def hill_climbing(n):
+    cost=0
+    while True:
+        # Initialize a random board
+        current_board = list(range(n))
+        random.shuffle(current_board)
+        current_conflicts = calculate_conflicts(current_board)
+        
+        while True:
+            # Generate neighbors by moving each queen to a different position
+            found_better = False
+            for i in range(n):
+                for j in range(n):
+                    if j != current_board[i]:  # Only consider different positions
+                        neighbor_board = list(current_board)
+                        neighbor_board[i] = j
+                        neighbor_conflicts = calculate_conflicts(neighbor_board)
+                        if neighbor_conflicts < current_conflicts:
+                            print_board(current_board)
+                            print(current_conflicts)
+                            print_board(neighbor_board)
+                            print(neighbor_conflicts)
+                            current_board = neighbor_board
+                            current_conflicts = neighbor_conflicts
+                            cost+=1
+                            found_better = True
+                            break
+                if found_better:
+                    break
+            
+            # If no better neighbor found, stop searching
+            if not found_better:
+                break
+
+        # If a solution is found (zero conflicts), return the board
+        if current_conflicts == 0:
+            return current_board, current_conflicts, cost
+
+def print_board(board):
+    n = len(board)
+    for i in range(n):
+        row = ['.'] * n
+        row[board[i]] = 'Q'  # Place a queen
+        print(' '.join(row))
+    print()
+print("===============")
+# Example Usage
+n = 4
+solution, conflicts, cost = hill_climbing(n)
+print("Final Board Configuration:")
+print_board(solution)
+print("Number of Cost:", cost)
